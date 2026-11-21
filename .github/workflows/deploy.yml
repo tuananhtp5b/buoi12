@@ -1,0 +1,30 @@
+name: Auto Build and Deploy MVC to Somee
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: Lay ma nguon tu GitHub
+        uses: actions/checkout@v4
+
+      - name: Cai dat moi truong .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x' # Đổi thành 9.0.x nếu project buoi12 của bạn dùng .NET 9
+
+      - name: Build va dong goi project
+        run: dotnet publish buoi12.sln -c Release -o ./publish
+
+      - name: Deploy code sang Somee qua FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /www.luongtuananh.somee.com/
